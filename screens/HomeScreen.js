@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, Image, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { OpenAI } from 'openai'
 import { OPENAI_API_KEY } from '@env';
@@ -11,69 +11,74 @@ const ChatScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [inputError, setInputError] = useState(false);
+  const [firstQuestionAsked, setFirstQuestionAsked] = useState(false); // Durumu burada tanımlayın
 
   const openai = new OpenAI({
         apiKey: OPENAI_API_KEY,
   });
+
+
   
   let thread = null;
 
   const handleSendMessage = async () => {
-  if (inputText.trim() === '') {
-    setInputError(true);
-    return;
-  }
+    if (!firstQuestionAsked) {
+      setFirstQuestionAsked(true); // İlk soru sorulduğunda durumu güncelleyin
+    }
+
+    if (inputText.trim() === '') {
+      setInputError(true);
+      return;
+    }
 
     setIsLoading(true);
     
-     const timestamp = firebasedegisken.FieldValue.serverTimestamp();
+    const timestamp = firebasedegisken.FieldValue.serverTimestamp();
 
-  // Firestore'a mesajı kaydet
+    // Firestore'a mesajı kaydet
     await firestore.collection('messagelog').add({
       content: inputText,
       role: 'user',
       timestamp: timestamp
-
     });
 
-  const assistant = await openai.beta.assistants.retrieve(
-    "asst_BkxLa5XEFFyZ1YQEyKpd6M1u"
-  );
+    const assistant = await openai.beta.assistants.retrieve(
+      "asst_BkxLa5XEFFyZ1YQEyKpd6M1u"
+    );
 
-  const currentThread = await getThread();
+    const currentThread = await getThread();
 
-  await openai.beta.threads.messages.create(currentThread.id, {
-    role: "user",
-    content: inputText
-  });
+    await openai.beta.threads.messages.create(currentThread.id, {
+      role: "user",
+      content: inputText
+    });
 
-  const run = await openai.beta.threads.runs.create(currentThread.id, {
-    assistant_id: assistant.id,
-  });
+    const run = await openai.beta.threads.runs.create(currentThread.id, {
+      assistant_id: assistant.id,
+    });
 
-  let isCompleted = false;
+    let isCompleted = false;
 
-  do {
-    const check_run = await openai.beta.threads.runs.retrieve(currentThread.id, run.id)
+    do {
+      const check_run = await openai.beta.threads.runs.retrieve(currentThread.id, run.id)
 
-    if (check_run.status === "completed") {
-      const messages = await openai.beta.threads.messages.list(currentThread.id);
+      if (check_run.status === "completed") {
+        const messages = await openai.beta.threads.messages.list(currentThread.id);
 
-      const reply = messages.data[0].content[0].text.value.toString().trim();
-      setChatHistory(prevChat => [...prevChat, { role: 'user', content: inputText }, { role: 'ai', content: reply }]);
-      isCompleted = true;
-    }
+        const reply = messages.data[0].content[0].text.value.toString().trim();
+        setChatHistory(prevChat => [...prevChat, { role: 'user', content: inputText }, { role: 'ai', content: reply }]);
+        isCompleted = true;
+      }
 
-    if (!isCompleted) {
-      await sleep(1000);
-    }
-  } while (!isCompleted)
+      if (!isCompleted) {
+        await sleep(1000);
+      }
+    } while (!isCompleted)
 
-  setIsLoading(false);
-  setInputText('');
-  setInputError(false);
-}
-
+    setIsLoading(false);
+    setInputText('');
+    setInputError(false);
+  }
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -84,11 +89,17 @@ const ChatScreen = () => {
     return thread;
   }
 
- 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0; // Değişiklik burada
 
   return (
     <View style={styles.container}>
+      {(!firstQuestionAsked && chatHistory.length === 0) && ( // Duruma göre ekranda fotoğraf ve yazıyı gösterin
+        <View style={styles.introContainer}>
+          <Image source={require('../img/TtbLogo.png')} style={styles.introImage} />
+          <Text style={styles.introText}>Hoş geldiniz! </Text>
+           <Text style={styles.introText}> Size nasıl yardımcı olabilirim?</Text>
+        </View>
+      )}
       <ScrollView 
         style={styles.chatContainer}
         contentContainerStyle={{ paddingBottom: 100 }} 
@@ -123,10 +134,8 @@ const ChatScreen = () => {
           ) : (
             <Icon name="send" size={24} color="#fff" />
           )}
-        </TouchableOpacity>
-
-       
-      </KeyboardAvoidingView>
+        </TouchableOpacity> 
+      </KeyboardAvoidingView>  
     </View>
   );
 };
@@ -136,7 +145,20 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fff', // Koyu Yeşil
-   
+  },
+  introContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  introImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  introText: {
+    fontSize: 18,
+    textAlign: 'center',
   },
   imageUser: {
     height: 30,
@@ -148,7 +170,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     marginBottom: 5,
-    borderRadius:20
+    borderRadius: 20
   },
   chatContainer: {
     flex: 1,
@@ -160,7 +182,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     maxWidth: '80%',
     alignSelf: 'flex-start',
-    
   },
   messageText: {
     fontSize: 16,
@@ -209,6 +230,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignSelf: 'center', // Yazi ortalanir
   },
+  introText: {
+    fontSize: 20,
+    color:'#B8B6B5'
+  },
+
+
+  
 });
 
 export default ChatScreen;

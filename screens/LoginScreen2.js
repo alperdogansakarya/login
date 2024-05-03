@@ -16,7 +16,6 @@ export default function LoginScreen2() {
     }
   });
 },[])
-
   
   const handleSignUp = () => {
     auth.createUserWithEmailAndPassword(email, password).

@@ -5,7 +5,7 @@ import CustomMenu from '../components/menu';
 
 
 
-const MenuScreen = ({ navigation }) => {
+const MenuScreen = ({ navigation }) => {1
   const handleAskAnything = () => {
     // 'Aklına Geleni Sor' ekranına git
     navigation.navigate('Home');
@@ -19,9 +19,9 @@ const MenuScreen = ({ navigation }) => {
   return (
       <View style={styles.container}>
           
-          <View style={styles.menuContainer}>
+          {/* <View style={styles.menuContainer}>
               <CustomMenu navigation={navigation} screens={[{ name: 'Home', title: 'Aklına Geleni Sor' }, { name: 'Ssk', title: 'Sık Sorulan Sorular' }]} />
-      </View>
+      </View> */}
 
       
       

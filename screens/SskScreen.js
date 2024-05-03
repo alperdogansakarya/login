@@ -6,7 +6,9 @@ export default function FaqScreen() {
   const [faqs, setFaqs] = useState([
     { question: 'Fındık ne zaman hasat edilir ?', answer: 'Fındıklar genellikle Ağustos ve Eylül aylarında hasat edilir. Bu dönemde kabukları çatlar ve fındıklar toplanmaya hazır hale gelir.', isOpen: false },
     { question: 'Fındık ağaçlarının bakımı nasıl yapılır', answer: 'Fındık ağaçlarının bakımı düzenli budama, sulama ve gübreleme işlemlerini içerir. Ayrıca zararlı böceklerle mücadele ve hastalıklara karşı önlemler almak da önemlidir.', isOpen: false },
-    { question: 'Soru 3', answer: 'Cevap 3', isOpen: false },
+    { question: 'Fındık ağaçları ne zaman budanmalıdır?', answer: 'Fındık ağaçları için budama zamanı, genellikle sonbahar-kış dönemi ve ilkbahar-yaz dönemi olarak belirtilmektedir. Sonbahar-kış budaması, hasat döneminden belli bir süre sonra, yaklaşık olarak Ekim ayının sonlarından başlayarak yapılabilir. Bu dönemde bitki dinlenmeye girmiş ve aktif büyüme ve gelişme dönemi sona ermiş olur. Bu işlem, Ocak içerisinde kurumaya yüz tutmuş, kurumuş, sıklaşmış, gelişmeden geri kalmış kalın ve ince dallar ile dip ve kök sürgünlerini temizlemeyi içerir. İlkbahar-yaz budaması ise Mart ayından itibaren başlayarak yaklaşık 3 aylık bir dönemde gerçekleştirilir. Bu dönemde dip ve kök sürgünleri ile kurumuş, kırılmış, ocakta ve ana dal üzerinde şekli bozulmuş sürgünler temizlenir.', isOpen: false },
+    { question: 'Fındık ağaçlarının bakımı nasıl yapılır', answer: 'Fındık ağaçlarının bakımı düzenli budama, sulama ve gübreleme işlemlerini içerir. Ayrıca zararlı böceklerle mücadele ve hastalıklara karşı önlemler almak da önemlidir.', isOpen: false },
+
   ]);
 
   const toggleFaq = (index) => {
