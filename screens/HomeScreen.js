@@ -4,7 +4,7 @@ import { OpenAI } from 'openai'
 import { OPENAI_API_KEY } from '@env';
 import { auth, firestore, firebasedegisken } from '../firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
-//import CustomMenu from '../components/menu';
+
 const ChatScreen = () => {
   const [inputText, setInputText] = useState('');
   const [name, setName] = useState('Alper');
@@ -14,11 +14,9 @@ const ChatScreen = () => {
   const [firstQuestionAsked, setFirstQuestionAsked] = useState(false); // Durumu burada tanımlayın
 
   const openai = new OpenAI({
-        apiKey: OPENAI_API_KEY,
+    apiKey: OPENAI_API_KEY,
   });
 
-
-  
   let thread = null;
 
   const handleSendMessage = async () => {
@@ -89,21 +87,42 @@ const ChatScreen = () => {
     return thread;
   }
 
-  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0; // Değişiklik burada
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+
+  const handleSelectQuestion = async (question) => {
+    setInputText(question); // Seçilen soruyu giriş metni olarak ayarla
+    await handleSendMessage(); // Seçilen soruyu gönder
+  }
+
+  const suggestedQuestions = [
+    "Fındık bakımı nasıl yapılır?"
+  ];
 
   return (
     <View style={styles.container}>
-      {(!firstQuestionAsked && chatHistory.length === 0) && ( // Duruma göre ekranda fotoğraf ve yazıyı gösterin
+      {(!firstQuestionAsked && chatHistory.length === 0) && (
         <View style={styles.introContainer}>
           <Image source={require('../img/TtbLogo.png')} style={styles.introImage} />
-          <Text style={styles.introText}>Hoş geldiniz! </Text>
-           <Text style={styles.introText}> Size nasıl yardımcı olabilirim?</Text>
+          <Text style={[styles.introText, { marginTop: 20 }]}>Hoş geldiniz! Size nasıl yardımcı olabilirim?</Text>
+          {/* Önerilen soruları listeleme */}
+          <View style={styles.suggestedQuestionsContainer}>
+            <Text style={styles.suggestedQuestionsTitle}>Önerilen Sorular:</Text>
+            {suggestedQuestions.map((question, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.suggestedQuestionButton} 
+                onPress={() => handleSelectQuestion(question)}
+              >
+                <Text style={styles.suggestedQuestionText}>{question}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       )}
       <ScrollView 
         style={styles.chatContainer}
         contentContainerStyle={{ paddingBottom: 100 }} 
-        keyboardShouldPersistTaps="handled" // Klavye açıkken ScrollView üzerindeki dokunuşları işlemek için
+        keyboardShouldPersistTaps="handled"
       >
         {chatHistory.map((message, index) => (
           <View key={index} style={[styles.messageContainer, { alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start' }]}>
@@ -144,7 +163,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff', // Koyu Yeşil
+    backgroundColor: '#fff', 
   },
   introContainer: {
     flex: 1,
@@ -154,7 +173,7 @@ const styles = StyleSheet.create({
   introImage: {
     width: 200,
     height: 200,
-    marginBottom: 20,
+    marginTop: 90,
   },
   introText: {
     fontSize: 18,
@@ -176,7 +195,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messageContainer: {
-    backgroundColor: '#006400', // Koyu Yeşil
+    backgroundColor: '#006400', 
     padding: 12,
     marginVertical: 7,
     borderRadius: 20,
@@ -228,15 +247,31 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: 'red',
     marginTop: 5,
-    alignSelf: 'center', // Yazi ortalanir
+    alignSelf: 'center', 
   },
   introText: {
     fontSize: 20,
     color:'#B8B6B5'
   },
-
-
-  
+  suggestedQuestionsContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  suggestedQuestionsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  suggestedQuestionButton: {
+    backgroundColor: '#006400',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  suggestedQuestionText: {
+    color: '#fff',
+    fontSize: 16,
+  },
 });
 
 export default ChatScreen;
