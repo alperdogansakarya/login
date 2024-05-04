@@ -37,16 +37,13 @@ export default function App() {
   return (
     <NavigationContainer>
       <Drawer.Navigator initialRouteName="Çıkış Yap">
-         <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} />
+        <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} options={{ headerShown: false }} />
         <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Ssk" component={SskScreen} />
         <Drawer.Screen name="Menu" component={MenuScreen} />
-
       </Drawer.Navigator>
     </NavigationContainer>
   );
-
-  
 }
 
 const styles = StyleSheet.create({
