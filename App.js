@@ -1,27 +1,26 @@
-
+import React, { useState } from 'react';
 import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, Platform } from 'react-native';
+import { StyleSheet, Text, View, Image, Platform, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import LoginScreen2 from './screens/LoginScreen2';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import SskScreen from './screens/SskScreen';
 import { Entypo } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
-
 
 const Stack = createNativeStackNavigator();
-const Tab =createBottomTabNavigator();
+const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
 const screenOptionsForTab = {
-  tabBarShowLabel:false,
-  headerShown:false,
-  tabBarStyle:{
+  tabBarShowLabel: false,
+  headerShown: false,
+  tabBarStyle: {
     position: "absolute",
     bottom: 0,
     right: 0,
@@ -29,92 +28,28 @@ const screenOptionsForTab = {
     elevation: 0,
     height: 40,
     background: "#fff",
-    
   }
 }
-function tabBar() {
-  return (
-      <Tab.Navigator screenOptions={screenOptionsForTab}>
-          <Tab.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{
-            tabBarIcon: ({focused})=>{
-              return (
-                <View style={{alignItems: "center", justifyContent: "center"}}> 
-                  <Entypo name="home" size={24} color={focused ? "#16247d": "#111"} />
-                  <Text style={{fonSize: 12, color: "#16247d"}}>HOME</Text>
-            </View>
-              )
-            }
-          }}
-          />
-          <Tab.Screen 
-          name="Ssk" 
-          component={SskScreen} 
-          options={{
-            tabBarIcon: ({focused})=>{
-              return (
-                <View style={{alignItems: "center", justifyContent: "center"}}> 
-                 <Entypo name="wallet" size={24} color={focused ? "#16247d": "#111"} />
-                  <Text style={{fonSize: 12, color: "#16247d"}}>Ssk</Text>
-            </View>
-              )
-            }
-          }}
-          />
-           <Tab.Screen 
-          name="Menu" 
-          component={MenuScreen} 
-          options={{
-            tabBarIcon: ({focused})=>{
-              return (
-                <View style={{alignItems: "center", justifyContent: "center"}}> 
-                  <Entypo name="briefcase" size={24} color={focused ? "#16247d": "#111"} />
-                  <Text style={{fonSize: 12, color: "#16247d"}}>HOME</Text>
-            </View>
-              )
-            }
-          }}
-          />
-       </Tab.Navigator>
-  )
-}
-
 
 export default function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+
   return (
-    <NavigationContainer
-      
-      style={styles.mainContainer}>
-            
-     <Stack.Navigator
-          screenOptions={{
-              headerStyle: {
-                backgroundColor: '#124936', 
-              },
-              headerTintColor: 'white', 
-              headerTitleStyle: {
-                fontWeight: 'bold', 
-              },
-              headerTitle: 'Tarım Tekno Bot', 
-            }}
-          >
-       <Stack.Screen options={{ headerShown : false, headerLeft: () => null }} name="Login" component={LoginScreen2} /> 
-        <Stack.Screen options={{ headerLeft: () => null }} name="Home" component={HomeScreen} />
-        <Stack.Screen options={{ headerLeft: () => null }} name="Menu" component={MenuScreen} />
-        <Stack.Screen options={{ headerLeft: () => null }} name="Ssk" component={SskScreen} />
-      </Stack.Navigator>
+    <NavigationContainer>
+      <Drawer.Navigator initialRouteName="Çıkış Yap">
+         <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} />
+        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Ssk" component={SskScreen} />
+        <Drawer.Screen name="Menu" component={MenuScreen} />
 
-      
-    
+      </Drawer.Navigator>
     </NavigationContainer>
-
- 
   );
+
+  
 }
+
 const styles = StyleSheet.create({
- 
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -130,11 +65,13 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: '#fff', 
-   
   },
   navigator: {
     backgroundColor: '#fff',
-     
+  },
+  logoutContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   }
-  
 });
