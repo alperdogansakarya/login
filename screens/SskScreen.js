@@ -61,13 +61,12 @@ const styles = StyleSheet.create({
   },
   faqItem: {
     backgroundColor: '#fff', // Kutu arka plan rengi
-    //borderRadius: 10,
-    marginBottom:10,
+    marginBottom: 10,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#8C999A',
-    borderRadius: 10
-   
+    borderWidth: 3,
+    borderColor: '#006400',
+    borderRadius: 10,
+    elevation: 2, // Gölge
   },
   faqContent: {
     flexDirection: 'row',
@@ -79,10 +78,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
-  //  borderBottomWidth: 1,
-    //borderRadius:30,
-  //  borderColor: '#006400',
-    
   },
   answer: {
     fontSize: 14,

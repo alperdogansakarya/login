@@ -8,12 +8,12 @@ import CustomMenu from '../components/menu';
 const MenuScreen = ({ navigation }) => {1
   const handleAskAnything = () => {
     // 'Aklına Geleni Sor' ekranına git
-    navigation.navigate('Home');
+    navigation.navigate('Aklına Geleni Sor');
   };
 
   const handleFAQs = () => {
     // 'Sık Sorulan Sorular' ekranına git
-    navigation.navigate('Ssk');
+    navigation.navigate('Sık Sorulan Sorular');
   };
 
   return (

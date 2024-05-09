@@ -6,16 +6,27 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-
+import { auth } from './firebase';
 import LoginScreen2 from './screens/LoginScreen2';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import SskScreen from './screens/SskScreen';
 import { Entypo } from '@expo/vector-icons';
+import ChatScreen from './screens/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+
+
+const handleSignOut = () => {
+  auth.signOut().then(() => {
+    navigation.navigate('Çıkış Yap')
+    console.log("başarıyla çıkış yapıldı")
+  })
+    .catch(error => alert(error.message))
+}
+
 
 const screenOptionsForTab = {
   tabBarShowLabel: false,
@@ -33,14 +44,15 @@ const screenOptionsForTab = {
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-
+ 
   return (
     <NavigationContainer>
+     
       <Drawer.Navigator initialRouteName="Çıkış Yap">
-        <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} options={{ headerShown: false }} />
-        <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Ssk" component={SskScreen} />
         <Drawer.Screen name="Menu" component={MenuScreen} />
+        <Drawer.Screen name="Aklına Geleni Sor" component={HomeScreen} />
+        <Drawer.Screen name="Sık Sorulan Sorular" component={SskScreen} />
+        <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} options={{ headerShown: false }}/>
       </Drawer.Navigator>
     </NavigationContainer>
   );

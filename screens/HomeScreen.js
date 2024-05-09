@@ -1,117 +1,115 @@
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, Image, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, Image, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
 import { OpenAI } from 'openai'
 import { OPENAI_API_KEY } from '@env';
 import { auth, firestore, firebasedegisken } from '../firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
 const ChatScreen = () => {
   const [inputText, setInputText] = useState('');
   const [name, setName] = useState('Alper');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [inputError, setInputError] = useState(false);
-  const [firstQuestionAsked, setFirstQuestionAsked] = useState(false); // Durumu burada tanımlayın
-
+  const [firstQuestionAsked, setFirstQuestionAsked] = useState(false);
   const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
   });
-
+   
   let thread = null;
-
   const handleSendMessage = async () => {
     if (!firstQuestionAsked) {
-      setFirstQuestionAsked(true); // İlk soru sorulduğunda durumu güncelleyin
+      setFirstQuestionAsked(true);
     }
-
     if (inputText.trim() === '') {
       setInputError(true);
       return;
     }
-
     setIsLoading(true);
-    
+    sendMessage();
+  };
+  const sendMessage = async () => {
     const timestamp = firebasedegisken.FieldValue.serverTimestamp();
-
-    // Firestore'a mesajı kaydet
     await firestore.collection('messagelog').add({
       content: inputText,
       role: 'user',
       timestamp: timestamp
     });
-
     const assistant = await openai.beta.assistants.retrieve(
       "asst_BkxLa5XEFFyZ1YQEyKpd6M1u"
     );
-
     const currentThread = await getThread();
-
     await openai.beta.threads.messages.create(currentThread.id, {
       role: "user",
       content: inputText
     });
-
     const run = await openai.beta.threads.runs.create(currentThread.id, {
       assistant_id: assistant.id,
     });
-
     let isCompleted = false;
-
     do {
       const check_run = await openai.beta.threads.runs.retrieve(currentThread.id, run.id)
-
       if (check_run.status === "completed") {
         const messages = await openai.beta.threads.messages.list(currentThread.id);
-
         const reply = messages.data[0].content[0].text.value.toString().trim();
         setChatHistory(prevChat => [...prevChat, { role: 'user', content: inputText }, { role: 'ai', content: reply }]);
         isCompleted = true;
       }
-
       if (!isCompleted) {
         await sleep(1000);
       }
     } while (!isCompleted)
-
     setIsLoading(false);
     setInputText('');
     setInputError(false);
-  }
-
+  };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
-
   const getThread = async () => {
     if(!thread)
       thread = await openai.beta.threads.create();
-
     return thread;
-  }
-
-  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
-
+  };
   const handleSelectQuestion = async (question) => {
-    setInputText(question); // Seçilen soruyu giriş metni olarak ayarla
-    await handleSendMessage(); // Seçilen soruyu gönder
-  }
+    setInputText(question);
+    await handleSendMessage();
+  };
+  const suggestQuestionLast = "Fındık bakımı nasıl yapılır?";
 
   const suggestedQuestions = [
     "Fındık bakımı nasıl yapılır?"
   ];
 
+const handleSuggestClick = () => {
+    setInputText(suggestQuestionLast); 
+  };
+
+
+  
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+  const clearChatHistory = () => {
+    setChatHistory([]);
+    setFirstQuestionAsked(false)
+  };
   return (
     <View style={styles.container}>
+      <View style={styles.temizleDiv}>
+        <TouchableOpacity style={styles.temizleAltDiv} onPress={clearChatHistory}>
+          <Text style={styles.temizleText}>Sohbeti Temizle <Icon name="trash-o" size={20} color="#fff" /> </Text>
+          
+        </TouchableOpacity>
+      </View>
       {(!firstQuestionAsked && chatHistory.length === 0) && (
         <View style={styles.introContainer}>
           <Image source={require('../img/TtbLogo.png')} style={styles.introImage} />
-          <Text style={[styles.introText, { marginTop: 20 }]}>Hoş geldiniz! Size nasıl yardımcı olabilirim?</Text>
-          {/* Önerilen soruları listeleme */}
+          <Text style={[styles.introText, { marginTop: 20 }]}>Hoş geldiniz!</Text>
+          <Text style={[styles.introText]}>Size nasıl yardımcı olabilirim?</Text>
           <View style={styles.suggestedQuestionsContainer}>
             <Text style={styles.suggestedQuestionsTitle}>Önerilen Sorular:</Text>
             {suggestedQuestions.map((question, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.suggestedQuestionButton} 
-                onPress={() => handleSelectQuestion(question)}
+              <TouchableOpacity
+                key={index}
+                style={styles.suggestedQuestionButton}
+                onPress={handleSuggestClick}
               >
                 <Text style={styles.suggestedQuestionText}>{question}</Text>
               </TouchableOpacity>
@@ -119,9 +117,9 @@ const ChatScreen = () => {
           </View>
         </View>
       )}
-      <ScrollView 
+      <ScrollView
         style={styles.chatContainer}
-        contentContainerStyle={{ paddingBottom: 100 }} 
+        contentContainerStyle={{ paddingBottom: 100 }}
         keyboardShouldPersistTaps="handled"
       >
         {chatHistory.map((message, index) => (
@@ -135,6 +133,8 @@ const ChatScreen = () => {
           </View>
         ))}
       </ScrollView>
+
+      
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={styles.inputContainer}
@@ -147,23 +147,23 @@ const ChatScreen = () => {
           placeholderTextColor="#888"
           style={[styles.input, inputError && styles.errorInput]}
         />
+        
         <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
           {isLoading ? (
             <ActivityIndicator size="small" color="fff" />
           ) : (
             <Icon name="send" size={24} color="#fff" />
           )}
-        </TouchableOpacity> 
-      </KeyboardAvoidingView>  
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff', 
+    backgroundColor: '#fff',
   },
   introContainer: {
     flex: 1,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messageContainer: {
-    backgroundColor: '#006400', 
+    backgroundColor: '#006400',
     padding: 12,
     marginVertical: 7,
     borderRadius: 20,
@@ -235,10 +235,16 @@ const styles = StyleSheet.create({
     borderColor: 'red',
   },
   sendButton: {
-    backgroundColor: '#006400', 
+    backgroundColor: '#006400',
     padding: 15,
     borderRadius: 10,
     marginLeft: 10,
+  },
+  clearButton: {
+    backgroundColor: '#006400', // Sarı renk
+    padding: 15,
+    borderRadius: 10,
+    marginRight: 10,
   },
   buttonText: {
     color: '#fff',
@@ -247,7 +253,7 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: 'red',
     marginTop: 5,
-    alignSelf: 'center', 
+    alignSelf: 'center',
   },
   introText: {
     fontSize: 20,
@@ -272,6 +278,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  temizleDiv: {
+   
+    width: '100%',
+    position: 'relative',
+    height:50
+  },
+  temizleAltDiv: {
+    position: 'absolute',
+    right: 105,
+    backgroundColor: '#006400',
+    marginVertical: 8,
+    borderRadius: 10,
+    padding: 5,
+    
+  },
+  temizleText: {
+    fontSize: 20,
+    color:'#fff'
+  }
 });
-
 export default ChatScreen;

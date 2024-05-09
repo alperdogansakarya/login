@@ -1,14 +1,13 @@
+
 import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState} from 'react';
 import { TextInput, Image } from 'react-native';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
-
 export default function LoginScreen2() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
-
   useEffect(() => {
   auth.onAuthStateChanged((user) => {
     if (user) {
@@ -27,7 +26,6 @@ export default function LoginScreen2() {
   }
 
 
-
   const handleLogin = () => {
     auth.signInWithEmailAndPassword(email, password).
       then(userCredentials => {
@@ -36,7 +34,6 @@ export default function LoginScreen2() {
       }).catch((error) => alert(error.message));
     
   }
-
   return (
     <KeyboardAvoidingView
       style={styles.container} behavior='padding'>
@@ -55,7 +52,6 @@ export default function LoginScreen2() {
           value={email}
           onChangeText={text => setEmail(text)}
         />
-
         <TextInput
           placeholder="Şifre"
           style={styles.input}
@@ -67,20 +63,16 @@ export default function LoginScreen2() {
       </View>
       
       <View style={styles.buttonContainer}>
-
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Giriş Yap</Text>         
         </TouchableOpacity>
-
         <TouchableOpacity onPress={handleSignUp} style={[styles.button, styles.outlineButton]}>
          <Text style={styles.outlineButtonText}>Kayıt Ol</Text>
         </TouchableOpacity>
-
       </View>
     </KeyboardAvoidingView>
   )
 }
-
 const styles = StyleSheet.create({
   container:{
     flex: 1,
@@ -137,5 +129,4 @@ const styles = StyleSheet.create({
   containerimg: {
     marginBottom:15
   }
-
 })
