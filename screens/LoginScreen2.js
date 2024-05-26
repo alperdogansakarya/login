@@ -1,46 +1,84 @@
-
-import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState} from 'react';
+import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { TextInput, Image } from 'react-native';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
+
 export default function LoginScreen2() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
-  useEffect(() => {
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      navigation.navigate('Menu');
-    }
-  });
-},[])
   
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.navigate('Menu');
+      }
+    });
+    return unsubscribe;
+  }, []);
+
   const handleSignUp = () => {
-    auth.createUserWithEmailAndPassword(email, password).
-      then(userCredentials => {
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Kullanıcı', user.email);
-      }).catch((error) => alert(error.message));
-    
-  }
-
+        navigation.navigate('Menu'); // Giriş yaptıktan sonra doğrudan yönlendir
+      })
+      .catch((error) => {
+        let errorMessage = '';
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = 'Bu email adresi zaten kullanılıyor.';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = 'Geçersiz email adresi.';
+            break;
+          case 'auth/weak-password':
+            errorMessage = 'Şifre en az 6 karakter olmalıdır.';
+            break;
+          default:
+            errorMessage = 'Kayıt olurken bir hata oluştu.';
+        }
+        Alert.alert('Kayıt Hatası', errorMessage);
+      });
+  };
 
   const handleLogin = () => {
-    auth.signInWithEmailAndPassword(email, password).
-      then(userCredentials => {
+    auth.signInWithEmailAndPassword(email, password)
+      .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Kullanıcı Giriş Yaptı', user.email);
-      }).catch((error) => alert(error.message));
-    
-  }
+        navigation.navigate('Menu'); // Giriş yaptıktan sonra doğrudan yönlendir
+      })
+      .catch((error) => {
+        let errorMessage = '';
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMessage = 'Geçersiz email adresi.';
+            break;
+          case 'auth/user-disabled':
+            errorMessage = 'Bu kullanıcı hesabı devre dışı bırakılmış.';
+            break;
+          case 'auth/user-not-found':
+            errorMessage = 'Böyle bir kullanıcı bulunamadı.';
+            break;
+          case 'auth/wrong-password':
+            errorMessage = 'Yanlış şifre.';
+            break;
+          default:
+            errorMessage = 'Giriş yaparken bir hata oluştu.';
+        }
+        Alert.alert('Giriş Hatası', errorMessage);
+      });
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container} behavior='padding'>
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
       
-       <View style={styles.containerimg}>
+      <View style={styles.containerimg}>
         <Image
-          source={require('../img/TtbLogo.png')} // Fotoğrafın dosya yolunu buraya ekleyin
+          source={require('../img/TtbLogo.png')}
           style={styles.image}
         />
       </View>
@@ -57,9 +95,8 @@ export default function LoginScreen2() {
           style={styles.input}
           secureTextEntry
           value={password}
-          onChangeText={text  => setPassword(text)}
+          onChangeText={text => setPassword(text)}
         />
-        
       </View>
       
       <View style={styles.buttonContainer}>
@@ -67,21 +104,21 @@ export default function LoginScreen2() {
           <Text style={styles.buttonText}>Giriş Yap</Text>         
         </TouchableOpacity>
         <TouchableOpacity onPress={handleSignUp} style={[styles.button, styles.outlineButton]}>
-         <Text style={styles.outlineButtonText}>Kayıt Ol</Text>
+          <Text style={styles.outlineButtonText}>Kayıt Ol</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
-  )
+  );
 }
+
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    
   },
-  input:{
+  input: {
     backgroundColor: 'white',
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -89,21 +126,21 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     elevation: 5
   },
-  inputContainer:{
+  inputContainer: {
     width: '80%',
   },
   buttonContainer: {
     width: '80%',
     marginTop: 30,
-     flexDirection: 'row', // Butonları yatay olarak yerleştirmek için
-    justifyContent: 'space-between', // Aralarındaki boşluğu paylaştırarak
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
     backgroundColor: '#124936',
     paddingVertical: 15,
     paddingHorizontal: 50,
     marginBottom: 5,
-   borderRadius:10,
+    borderRadius: 10,
     alignItems: 'center',
     elevation: 5,
     marginRight: 10,
@@ -111,22 +148,19 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
-    
   },
   outlineButton: {
     backgroundColor: 'white'
-    
   },
   outlineButtonText: {
     fontSize: 16,
-   
   },
   image: {
-    width: 200, 
-    height: 200, 
-    resizeMode: 'cover', 
+    width: 200,
+    height: 200,
+    resizeMode: 'cover',
   },
   containerimg: {
-    marginBottom:15
+    marginBottom: 15
   }
-})
+});

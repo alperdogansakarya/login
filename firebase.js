@@ -5,7 +5,6 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore'; // Firestore modülünü içe aktarın
 // https://firebase.google.com/docs/web/setup#available-libraries
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAzfMHXkF19FvvU1dsa3lr3V2OtymOEMJY",
   authDomain: "login-644a8.firebaseapp.com",
