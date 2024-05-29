@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import faqsData from '../faqs.json'; 
 
 export default function FaqScreen() {
-  const [faqs, setFaqs] = useState([
-    { question: 'Fındık ne zaman hasat edilir ?', answer: 'Fındıklar genellikle Ağustos ve Eylül aylarında hasat edilir. Bu dönemde kabukları çatlar ve fındıklar toplanmaya hazır hale gelir.', isOpen: false },
-    { question: 'Fındık ağaçlarının bakımı nasıl yapılır', answer: 'Fındık ağaçlarının bakımı düzenli budama, sulama ve gübreleme işlemlerini içerir. Ayrıca zararlı böceklerle mücadele ve hastalıklara karşı önlemler almak da önemlidir.', isOpen: false },
-    { question: 'Fındık ağaçları ne zaman budanmalıdır?', answer: 'Fındık ağaçları için budama zamanı, genellikle sonbahar-kış dönemi ve ilkbahar-yaz dönemi olarak belirtilmektedir. Sonbahar-kış budaması, hasat döneminden belli bir süre sonra, yaklaşık olarak Ekim ayının sonlarından başlayarak yapılabilir. Bu dönemde bitki dinlenmeye girmiş ve aktif büyüme ve gelişme dönemi sona ermiş olur. Bu işlem, Ocak içerisinde kurumaya yüz tutmuş, kurumuş, sıklaşmış, gelişmeden geri kalmış kalın ve ince dallar ile dip ve kök sürgünlerini temizlemeyi içerir. İlkbahar-yaz budaması ise Mart ayından itibaren başlayarak yaklaşık 3 aylık bir dönemde gerçekleştirilir. Bu dönemde dip ve kök sürgünleri ile kurumuş, kırılmış, ocakta ve ana dal üzerinde şekli bozulmuş sürgünler temizlenir.', isOpen: false },
-    { question: 'Fındık ağaçlarının bakımı nasıl yapılır', answer: 'Fındık ağaçlarının bakımı düzenli budama, sulama ve gübreleme işlemlerini içerir. Ayrıca zararlı böceklerle mücadele ve hastalıklara karşı önlemler almak da önemlidir.', isOpen: false },
+  const [faqs, setFaqs] = useState([]);
 
-  ]);
+  useEffect(() => {
+    setFaqs(faqsData); 
+  }, []);
 
   const toggleFaq = (index) => {
     const newFaqs = [...faqs];
@@ -39,14 +38,14 @@ export default function FaqScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff', // Arka plan rengi
+    backgroundColor: '#f9f9f9',
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
   baslikContainer: {
     borderBottomWidth: 1,
     borderTopWidth: 1,
-    borderColor: '#8C999A',
+    borderColor: '#ddd',
     marginBottom: 10,
     paddingBottom: 10,
   },
@@ -55,18 +54,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color:'#006400',
-    textShadowColor: 'rgba(0, 0, 0, 0.25)', // Gölge rengi
-    textShadowOffset: { width: 1, height: 1 }, // Gölge offset
-    textShadowRadius: 2, // Gölge yarıçapı
+    textShadowColor: 'rgba(0, 0, 0, 0.25)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   faqItem: {
-    backgroundColor: '#fff', // Kutu arka plan rengi
+    backgroundColor: '#fff',
     marginBottom: 10,
     overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: '#006400',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 10,
-    elevation: 2, // Gölge
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   faqContent: {
     flexDirection: 'row',
@@ -77,11 +80,11 @@ const styles = StyleSheet.create({
   question: {
     fontWeight: 'bold',
     fontSize: 16,
-    marginBottom: 5,
   },
   answer: {
-    fontSize: 14,
+    fontSize: 18,
     paddingHorizontal: 15,
     paddingBottom: 15,
+    color: '#333',
   },
 });

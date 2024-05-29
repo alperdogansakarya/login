@@ -1,58 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, Platform, Button } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { auth } from './firebase';
 import LoginScreen2 from './screens/LoginScreen2';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import SskScreen from './screens/SskScreen';
-import { Entypo } from '@expo/vector-icons';
-import ChatScreen from './screens/HomeScreen';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
+const CustomDrawerContent = (props) => {
+  const [userEmail, setUserEmail] = useState(null);
 
-const handleSignOut = () => {
-  auth.signOut().then(() => {
-    navigation.navigate('Çıkış Yap')
-    console.log("başarıyla çıkış yapıldı")
-  })
-    .catch(error => alert(error.message))
-}
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserEmail(user.email);
+      } else {
+        setUserEmail(null);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
+  const handleSignOut = () => {
+    auth.signOut().then(() => {
+      props.navigation.navigate('Çıkış Yap');
+      console.log("Başarıyla çıkış yapıldı");
+    })
+    .catch(error => alert(error.message));
+  };
 
-const screenOptionsForTab = {
-  tabBarShowLabel: false,
-  headerShown: false,
-  tabBarStyle: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
-    elevation: 0,
-    height: 40,
-    background: "#fff",
-  }
-}
+  return (
+    <View style={styles.container}>
+      <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContentScroll}>
+        <View style={styles.photoContainer}>
+          <Image
+            source={require('./img/TtbLogo.png')}
+            style={styles.image}
+          />
+        </View>
+
+        {userEmail && (
+          <View style={styles.userInfo}>
+            <Image
+              source={require('./img/user.png')} // Küçük profil fotoğrafı için placeholder resim
+              style={styles.profileImage}
+            />
+            <Text style={styles.userEmail}>{userEmail}</Text>
+          </View>
+        )}
+
+        <DrawerItemList {...props} />
+      </DrawerContentScrollView>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Geliştirici: Ali Alper Doğan</Text>
+      </View>
+    </View>
+  );
+};
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
- 
   return (
     <NavigationContainer>
-     
-      <Drawer.Navigator initialRouteName="Çıkış Yap">
+      <Drawer.Navigator
+        initialRouteName="Çıkış Yap"
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+      >
         <Drawer.Screen name="Menu" component={MenuScreen} />
         <Drawer.Screen name="Aklına Geleni Sor" component={HomeScreen} />
         <Drawer.Screen name="Sık Sorulan Sorular" component={SskScreen} />
-        <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} options={{ headerShown: false }}/>
+        <Drawer.Screen name="Çıkış Yap" component={LoginScreen2} options={{ headerShown: false }} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
@@ -61,26 +82,44 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  drawerContentScroll: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+  },
+  photoContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    marginTop: 20,
   },
   image: {
-    width: 200, 
-    height: 200, 
-    resizeMode: 'cover', 
+    width: 100,
+    height: 100,
+    borderRadius: 5,
   },
-  mainContainer: {
-    flex: 1,
-    backgroundColor: '#fff', 
-  },
-  navigator: {
-    backgroundColor: '#fff',
-  },
-  logoutContainer: {
-    flex: 1,
+  userInfo: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-  }
+    marginVertical: 10,
+    paddingLeft: 20, // Email ve profil fotoğrafını sola hizalamak için padding
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  userEmail: {
+    fontSize: 16,
+  },
+  footer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });

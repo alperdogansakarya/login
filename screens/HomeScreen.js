@@ -28,6 +28,7 @@ const ChatScreen = () => {
     setIsLoading(true);
     sendMessage();
   };
+
   const sendMessage = async () => {
     const timestamp = firebasedegisken.FieldValue.serverTimestamp();
     await firestore.collection('messagelog').add({
@@ -63,6 +64,8 @@ const ChatScreen = () => {
     setInputText('');
     setInputError(false);
   };
+
+  
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const getThread = async () => {
     if(!thread)
@@ -74,22 +77,18 @@ const ChatScreen = () => {
     await handleSendMessage();
   };
   const suggestQuestionLast = "Fındık bakımı nasıl yapılır?";
-
   const suggestedQuestions = [
     "Fındık bakımı nasıl yapılır?"
   ];
-
 const handleSuggestClick = () => {
     setInputText(suggestQuestionLast); 
   };
-
-
-  
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
   const clearChatHistory = () => {
     setChatHistory([]);
     setFirstQuestionAsked(false)
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.temizleDiv}>
@@ -133,8 +132,6 @@ const handleSuggestClick = () => {
           </View>
         ))}
       </ScrollView>
-
-      
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={styles.inputContainer}
