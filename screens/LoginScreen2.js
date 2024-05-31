@@ -73,6 +73,32 @@ export default function LoginScreen2() {
       });
   };
 
+  const handlePasswordReset = () => {
+    if (!email) {
+      Alert.alert('Şifre Sıfırlama Hatası', 'Lütfen e-posta adresinizi girin.');
+      return;
+    }
+
+    auth.sendPasswordResetEmail(email)
+      .then(() => {
+        Alert.alert('Şifre Sıfırlama', 'Şifre sıfırlama e-postası gönderildi.');
+      })
+      .catch((error) => {
+        let errorMessage = '';
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMessage = 'Geçersiz email adresi.';
+            break;
+          case 'auth/user-not-found':
+            errorMessage = 'Böyle bir kullanıcı bulunamadı.';
+            break;
+          default:
+            errorMessage = 'Şifre sıfırlarken bir hata oluştu.';
+        }
+        Alert.alert('Şifre Sıfırlama Hatası', errorMessage);
+      });
+  };
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
       
@@ -107,6 +133,10 @@ export default function LoginScreen2() {
           <Text style={styles.outlineButtonText}>Kayıt Ol</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity onPress={handlePasswordReset} style={styles.forgotPasswordButton}>
+        <Text style={styles.forgotPasswordButtonText}>Şifremi Unuttum</Text>
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
@@ -162,5 +192,12 @@ const styles = StyleSheet.create({
   },
   containerimg: {
     marginBottom: 15
+  },
+  forgotPasswordButton: {
+    marginTop: 20,
+  },
+  forgotPasswordButtonText: {
+    color: '#124936',
+    fontSize: 16,
   }
 });
