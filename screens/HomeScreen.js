@@ -28,7 +28,6 @@ const ChatScreen = () => {
     setIsLoading(true);
     sendMessage();
   };
-
   const sendMessage = async () => {
     const timestamp = firebasedegisken.FieldValue.serverTimestamp();
     await firestore.collection('messagelog').add({
@@ -64,7 +63,6 @@ const ChatScreen = () => {
     setInputText('');
     setInputError(false);
   };
-
   
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const getThread = async () => {
@@ -88,7 +86,6 @@ const handleSuggestClick = () => {
     setChatHistory([]);
     setFirstQuestionAsked(false)
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.temizleDiv}>
@@ -283,7 +280,7 @@ const styles = StyleSheet.create({
   },
   temizleAltDiv: {
     position: 'absolute',
-    right: 105,
+    right:90,
     backgroundColor: '#006400',
     marginVertical: 8,
     borderRadius: 10,

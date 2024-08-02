@@ -1,9 +1,9 @@
+
 import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { TextInput, Image } from 'react-native';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
-
 export default function LoginScreen2() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +17,6 @@ export default function LoginScreen2() {
     });
     return unsubscribe;
   }, []);
-
   const handleSignUp = () => {
     auth.createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
@@ -43,7 +42,6 @@ export default function LoginScreen2() {
         Alert.alert('Kayıt Hatası', errorMessage);
       });
   };
-
   const handleLogin = () => {
     auth.signInWithEmailAndPassword(email, password)
       .then(userCredentials => {
@@ -72,13 +70,11 @@ export default function LoginScreen2() {
         Alert.alert('Giriş Hatası', errorMessage);
       });
   };
-
   const handlePasswordReset = () => {
     if (!email) {
       Alert.alert('Şifre Sıfırlama Hatası', 'Lütfen e-posta adresinizi girin.');
       return;
     }
-
     auth.sendPasswordResetEmail(email)
       .then(() => {
         Alert.alert('Şifre Sıfırlama', 'Şifre sıfırlama e-postası gönderildi.');
@@ -98,7 +94,6 @@ export default function LoginScreen2() {
         Alert.alert('Şifre Sıfırlama Hatası', errorMessage);
       });
   };
-
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
       
@@ -133,14 +128,12 @@ export default function LoginScreen2() {
           <Text style={styles.outlineButtonText}>Kayıt Ol</Text>
         </TouchableOpacity>
       </View>
-
       <TouchableOpacity onPress={handlePasswordReset} style={styles.forgotPasswordButton}>
         <Text style={styles.forgotPasswordButtonText}>Şifremi Unuttum</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

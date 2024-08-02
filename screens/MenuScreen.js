@@ -79,14 +79,14 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   dot: {
-    backgroundColor: 'rgba(0,0,0,.2)',
+    backgroundColor: 'rgba(0,0,0,.1)',
     width: 8,
     height: 8,
     borderRadius: 4,
     margin: 3,
   },
   activeDot: {
-    backgroundColor: '#000',
+    backgroundColor: 'rgba(0,0,0,.3)',
     width: 8,
     height: 8,
     borderRadius: 4,
